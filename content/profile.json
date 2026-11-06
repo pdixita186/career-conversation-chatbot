@@ -1,0 +1,35 @@
+{
+  "is_sample": true,
+  "name": "Alex Morgan",
+  "first_name": "Alex",
+  "initials": "AM",
+  "pronouns": "they/them",
+  "role": "Senior Product Analyst",
+  "location": "Toronto, open to remote",
+  "site_label": "alexmorgan.dev / ask",
+  "headline": "Ask me about my work before we talk.",
+  "pitch": "This assistant knows my resume, past projects and what I'm looking for next. Ask it anything you'd ask in a first screening call.",
+  "summary": "Product analyst who turns messy usage data into roadmap decisions. Seven years across fintech and B2B SaaS, most recently leading analytics for a 40-person product org.",
+  "facts": [
+    { "value": "7 yrs", "label": "in analytics" },
+    { "value": "3", "label": "products shipped" },
+    { "value": "4 wks", "label": "notice period" }
+  ],
+  "experience": [
+    { "dates": "2022 – now", "title": "Senior Product Analyst, Ledgerly", "detail": "Owns pricing and retention analytics" },
+    { "dates": "2019 – 2022", "title": "Product Analyst, Northwind SaaS", "detail": "Built the company's first experiment platform" },
+    { "dates": "2017 – 2019", "title": "Data Analyst, Brightpath Bank", "detail": "Credit-risk reporting and dashboards" }
+  ],
+  "skills": ["SQL", "Python", "A/B testing", "dbt", "Looker", "Pricing strategy", "Stakeholder storytelling"],
+  "email": "alex.morgan@example.com",
+  "linkedin": "https://www.linkedin.com/",
+  "resume_url": "",
+  "suggested_questions": [
+    { "label": "Background", "question": "What's Alex's background?" },
+    { "label": "Strongest skills", "question": "What are their strongest skills?" },
+    { "label": "A project they led", "question": "Tell me about a project they led" },
+    { "label": "Role they want", "question": "What role are they looking for?" },
+    { "label": "Salary expectation", "question": "What's their salary expectation?" },
+    { "label": "Get in touch", "question": "How do I get in touch?" }
+  ]
+}

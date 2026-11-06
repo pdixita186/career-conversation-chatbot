@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career Chat</title>
+<meta name="description" content="Ask questions about my experience, skills and projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/static/styles.css">
+<style>html,body{margin:0}</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Welcome -->
+  <section class="welcome" id="view-welcome" aria-label="Welcome">
+    <div class="welcome-main">
+      <div class="welcome-top">
+        <span class="brand" data-bind="site_label"></span>
+        <span class="mock-flag" id="flag" hidden></span>
+      </div>
+      <div class="intro">
+        <div class="avatar" aria-hidden="true" data-bind="initials"></div>
+        <h1 data-bind="headline"></h1>
+        <p class="role" id="role-line"></p>
+        <p class="pitch" data-bind="pitch"></p>
+        <div class="cta-row">
+          <button class="btn btn-primary" type="button" data-go="chat">
+            Start a conversation
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn btn-ghost" type="button" data-go="profile">View profile</button>
+        </div>
+      </div>
+      <p class="how" id="how"></p>
+    </div>
+    <aside class="welcome-side" aria-label="Suggested questions">
+      <span class="label">Recruiters usually ask</span>
+      <ul class="ask-list" id="ask-list"></ul>
+      <div class="facts" id="facts"></div>
+    </aside>
+  </section>
+
+  <!-- Chat + profile panel -->
+  <section class="chat-view" id="view-chat" aria-label="Chat" hidden>
+    <div class="chat-col">
+      <header class="chat-head">
+        <button class="btn btn-quiet" type="button" data-go="welcome" aria-label="Back to welcome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="avatar" aria-hidden="true" data-bind="initials"></div>
+        <div class="who">
+          <b id="assistant-name"></b>
+          <span class="status" id="status-line"></span>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-ghost" type="button" id="btn-contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+            <span class="btn-label" id="contact-label"></span>
+          </button>
+          <button class="btn btn-quiet" type="button" id="btn-panel" aria-controls="panel" aria-expanded="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span class="btn-label">Profile</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="messages" id="messages" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+
+      <div class="composer">
+        <form id="composer">
+          <input id="q" type="text" autocomplete="off" maxlength="1000" placeholder="Ask about experience, skills, projects…" aria-label="Your question">
+          <button class="btn btn-primary" type="submit" id="send">Send</button>
+        </form>
+        <small id="composer-note"></small>
+      </div>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <aside class="panel" id="panel" aria-label="Profile">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <h2 data-bind="name"></h2>
+          <button class="btn btn-quiet close-panel" type="button" id="btn-close-panel" aria-label="Close profile">✕</button>
+        </div>
+        <section>
+          <span class="label">Summary</span>
+          <p class="summary" data-bind="summary"></p>
+        </section>
+        <section>
+          <span class="label">Experience</span>
+          <ol class="timeline" id="timeline"></ol>
+        </section>
+        <section>
+          <span class="label">Skills</span>
+          <div class="skills" id="skills"></div>
+        </section>
+        <section>
+          <span class="label">Resume &amp; links</span>
+          <div class="panel-links">
+            <a class="btn btn-primary" id="resume-link" target="_blank" rel="noopener" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+              Download resume (PDF)
+            </a>
+            <a class="btn btn-ghost" id="linkedin-link" target="_blank" rel="noopener" hidden>LinkedIn profile ↗</a>
+            <div class="copy-row">
+              <code id="email-text" data-bind="email"></code>
+              <button class="btn btn-quiet" type="button" id="btn-copy">Copy</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
