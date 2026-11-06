@@ -1,0 +1,643 @@
+<title>Career Chat Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one app shell. Welcome screen, then a chat column with a profile panel beside it (a drawer on phones). */
+:root {
+  --bg: #F4F6F9;
+  --surface: #FFFFFF;
+  --ink: #17202A;
+  --muted: #5A6573;
+  --line: #DCE2E9;
+  --accent: #1C4E8A;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E5EDF7;
+  --bubble: #EDF1F5;
+  --ok: #1D7A4E;
+  --ok-soft: #E3F3EA;
+  --warn: #8A5A12;
+  --warn-soft: #FBF1DE;
+  --scrim: rgba(15, 22, 30, .42);
+  --shadow: 0 1px 2px rgba(20, 32, 48, .06), 0 8px 24px rgba(20, 32, 48, .06);
+
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1319; --surface: #151C24; --ink: #E5EAF0; --muted: #98A4B1; --line: #26313D;
+    --accent: #82B2EC; --accent-ink: #0A1420; --accent-soft: #1A2A3E; --bubble: #1C2530;
+    --ok: #5FC491; --ok-soft: #15301F; --warn: #E3B567; --warn-soft: #33270F;
+    --scrim: rgba(0, 0, 0, .55); --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1319; --surface: #151C24; --ink: #E5EAF0; --muted: #98A4B1; --line: #26313D;
+  --accent: #82B2EC; --accent-ink: #0A1420; --accent-soft: #1A2A3E; --bubble: #1C2530;
+  --ok: #5FC491; --ok-soft: #15301F; --warn: #E3B567; --warn-soft: #33270F;
+  --scrim: rgba(0, 0, 0, .55); --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-block: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+
+.mock-flag {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--warn); background: var(--warn-soft); border-radius: 999px; padding: 3px 10px;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+
+.app {
+  height: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: var(--r-sm); border: 1px solid transparent; cursor: pointer;
+  padding: 10px 16px; font-weight: 600; font-size: 14px; text-decoration: none;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-quiet { background: transparent; color: var(--muted); padding: 8px 10px; }
+.btn-quiet:hover { color: var(--accent); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+.avatar {
+  flex: none; display: grid; place-items: center; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+  font-family: var(--font-display); font-weight: 600;
+}
+
+/* ---------- Welcome ---------- */
+.welcome { flex: 1; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.welcome-main { padding: clamp(24px, 5vw, 56px); display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.welcome-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.intro { display: flex; flex-direction: column; gap: 18px; max-width: 34rem; }
+.intro .avatar { width: 64px; height: 64px; font-size: 24px; }
+.intro h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 4.6vw, 46px); line-height: 1.08; letter-spacing: -.01em; }
+.intro .role { color: var(--muted); font-size: 16px; }
+.intro .pitch { font-size: 17px; max-width: 62ch; }
+.cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.how {
+  font-size: 13px; color: var(--muted); max-width: 34rem;
+  border-top: 1px solid var(--line); padding-top: 16px;
+}
+
+.welcome-side { background: var(--bg); border-left: 1px solid var(--line); padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ask-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ask-list button {
+  width: 100%; text-align: left; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.ask-list button:hover { border-color: var(--accent); }
+.ask-list button span:last-child { color: var(--accent); flex: none; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px; }
+.fact b { display: block; font-family: var(--font-display); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fact span { font-size: 12px; color: var(--muted); }
+
+/* ---------- Chat ---------- */
+.chat-view { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
+.chat-view.panel-closed { grid-template-columns: minmax(0, 1fr) 0; }
+.chat-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.chat-head {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.chat-head .avatar { width: 40px; height: 40px; font-size: 16px; }
+.chat-head .who { min-width: 0; flex: 1; }
+.chat-head .who b { display: block; font-weight: 600; }
+.status { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+.head-actions { display: flex; gap: 4px; align-items: center; }
+
+.messages { flex: 1; min-height: 0; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; }
+.msg { display: flex; gap: 10px; max-width: 46rem; }
+.msg .avatar { width: 30px; height: 30px; font-size: 12px; margin-top: 2px; }
+.bubble { padding: 10px 14px; border-radius: var(--r-md); min-width: 0; overflow-wrap: anywhere; }
+.bubble p + p, .bubble ul { margin-top: 8px; }
+.bubble ul { padding-left: 18px; margin-bottom: 0; }
+.msg.bot .bubble { background: var(--bubble); border-top-left-radius: 4px; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.user .bubble { background: var(--accent); color: var(--accent-ink); border-top-right-radius: 4px; }
+.source { display: block; margin-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.logged {
+  display: inline-flex; gap: 6px; align-items: center; margin-top: 8px;
+  font-size: 12px; color: var(--warn); background: var(--warn-soft); padding: 3px 8px; border-radius: 999px;
+}
+.inline-action { margin-top: 10px; }
+
+.typing { display: inline-flex; gap: 4px; padding: 14px; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); opacity: .4; animation: blink 1.2s infinite; }
+.typing i:nth-child(2) { animation-delay: .2s; }
+.typing i:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 12px; }
+.chip {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--ink);
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+.composer { border-top: 1px solid var(--line); padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+.composer form { display: flex; gap: 8px; }
+.composer input {
+  flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--surface); padding: 10px 12px;
+}
+.composer input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.composer small { color: var(--muted); font-size: 12px; }
+
+/* Contact card */
+.contact-card {
+  border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-md);
+  padding: 16px; display: flex; flex-direction: column; gap: 12px; width: min(100%, 26rem);
+}
+.contact-card h3 { font-family: var(--font-display); font-size: 19px; font-weight: 600; }
+.contact-card p.lead { font-size: 13px; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 13px; font-weight: 500; }
+.field label .opt { color: var(--muted); font-weight: 400; }
+.field input, .field select {
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 9px 10px; width: 100%;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field .err { font-size: 12px; color: #C0392B; }
+.field.invalid input { border-color: #C0392B; }
+.form-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.form-foot small { color: var(--muted); font-size: 12px; }
+.done { display: flex; gap: 10px; align-items: flex-start; background: var(--ok-soft); color: var(--ink); border-radius: var(--r-sm); padding: 12px; }
+.done svg { width: 20px; height: 20px; color: var(--ok); flex: none; margin-top: 2px; }
+
+/* Profile panel */
+.panel { border-left: 1px solid var(--line); background: var(--bg); overflow-y: auto; min-width: 0; }
+.panel-closed .panel { visibility: hidden; }
+.panel-inner { padding: 20px; display: flex; flex-direction: column; gap: 22px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+.panel-head h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.panel section { display: flex; flex-direction: column; gap: 10px; }
+.panel .summary { font-size: 14px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; border-left: 2px solid var(--line); }
+.timeline li { padding-left: 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+.timeline li:not(:first-child)::before { border-color: var(--line); }
+.timeline b { display: block; font-size: 14px; }
+.timeline span { font-size: 13px; color: var(--muted); }
+.timeline .dates { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.skills { display: flex; flex-wrap: wrap; gap: 6px; }
+.skill { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
+.panel-links { display: flex; flex-direction: column; gap: 8px; }
+.copy-row { display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 10px; }
+.copy-row code { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12px; overflow-wrap: anywhere; user-select: all; }
+.close-panel { display: none; }
+.scrim { display: none; }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: var(--r-sm); font-size: 14px;
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 40; max-width: calc(100% - 32px);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .chat-view, .chat-view.panel-closed { grid-template-columns: minmax(0, 1fr); }
+  .panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 88vw); z-index: 30;
+    border-left: 1px solid var(--line); box-shadow: var(--shadow);
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    transform: translateX(105%); transition: transform .25s ease;
+  }
+  .panel-closed .panel { visibility: visible; }
+  .chat-view.drawer-open .panel { transform: translateX(0); }
+  .chat-view.drawer-open .scrim { display: block; position: fixed; inset: 0; background: var(--scrim); z-index: 25; }
+  .close-panel { display: inline-flex; }
+}
+@media (max-width: 760px) {
+  .welcome { grid-template-columns: minmax(0, 1fr); }
+  .welcome-side { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (max-width: 480px) {
+  body { padding-block: 8px; }
+  .head-actions .btn-label { display: none; }
+  .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fact b { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="app" id="app">
+
+  <!-- ===== Screen 1: Welcome ===== -->
+  <section class="welcome" id="view-welcome" aria-label="Welcome">
+    <div class="welcome-main">
+      <div class="welcome-top">
+        <span class="brand">alexmorgan.dev / ask</span>
+        <span class="mock-flag">Mockup · sample content</span>
+      </div>
+      <div class="intro">
+        <div class="avatar" aria-hidden="true">AM</div>
+        <h1>Ask me about my work before we talk.</h1>
+        <p class="role">Alex Morgan · Senior Product Analyst · Toronto, open to remote</p>
+        <p class="pitch">This assistant knows my resume, past projects and what I'm looking for next. Ask it anything you'd ask in a first screening call.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" type="button" data-go="chat">
+            Start a conversation
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn btn-ghost" type="button" data-go="profile">View profile</button>
+        </div>
+      </div>
+      <p class="how">Answers come only from Alex's resume and project notes. If the assistant doesn't know something, it says so and passes the question to Alex.</p>
+    </div>
+
+    <aside class="welcome-side" aria-label="Suggested questions">
+      <span class="label">Recruiters usually ask</span>
+      <ul class="ask-list">
+        <li><button type="button" data-ask="What's Alex's background?"><span>What's Alex's background?</span><span aria-hidden="true">→</span></button></li>
+        <li><button type="button" data-ask="Tell me about a project they led"><span>Tell me about a project they led</span><span aria-hidden="true">→</span></button></li>
+        <li><button type="button" data-ask="What role are they looking for?"><span>What role are they looking for?</span><span aria-hidden="true">→</span></button></li>
+        <li><button type="button" data-ask="When can they start?"><span>When can they start?</span><span aria-hidden="true">→</span></button></li>
+      </ul>
+      <div class="facts">
+        <div class="fact"><b>7 yrs</b><span>in analytics</span></div>
+        <div class="fact"><b>3</b><span>products shipped</span></div>
+        <div class="fact"><b>4 wks</b><span>notice period</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ===== Screen 2: Chat + profile panel ===== -->
+  <section class="chat-view" id="view-chat" aria-label="Chat" hidden>
+    <div class="chat-col">
+      <header class="chat-head">
+        <button class="btn btn-quiet" type="button" data-go="welcome" aria-label="Back to welcome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="avatar" aria-hidden="true">AM</div>
+        <div class="who">
+          <b>Alex's career assistant</b>
+          <span class="status">Answers from Alex's resume</span>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-ghost" type="button" id="btn-contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+            <span class="btn-label">Contact Alex</span>
+          </button>
+          <button class="btn btn-quiet" type="button" id="btn-panel" aria-controls="panel" aria-expanded="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span class="btn-label">Profile</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="messages" id="messages" aria-live="polite"></div>
+
+      <div class="chips" id="chips">
+        <button class="chip" type="button" data-ask="What's Alex's background?">Background</button>
+        <button class="chip" type="button" data-ask="What are their strongest skills?">Strongest skills</button>
+        <button class="chip" type="button" data-ask="Tell me about a project they led">A project they led</button>
+        <button class="chip" type="button" data-ask="What role are they looking for?">Role they want</button>
+        <button class="chip" type="button" data-ask="What's their salary expectation?">Salary expectation</button>
+        <button class="chip" type="button" data-ask="How do I get in touch?">Get in touch</button>
+      </div>
+
+      <div class="composer">
+        <form id="composer">
+          <input id="q" type="text" autocomplete="off" placeholder="Ask about experience, skills, projects…" aria-label="Your question">
+          <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+        <small>Mockup: replies are scripted. Try "skills", "remote", or something it can't answer.</small>
+      </div>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <!-- Screen 4: Profile / resume panel -->
+    <aside class="panel" id="panel" aria-label="Profile">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <h2>Alex Morgan</h2>
+          <button class="btn btn-quiet close-panel" type="button" id="btn-close-panel" aria-label="Close profile">✕</button>
+        </div>
+        <section>
+          <span class="label">Summary</span>
+          <p class="summary">Product analyst who turns messy usage data into roadmap decisions. Seven years across fintech and B2B SaaS, most recently leading analytics for a 40-person product org.</p>
+        </section>
+        <section>
+          <span class="label">Experience</span>
+          <ol class="timeline">
+            <li><span class="dates">2022 – now</span><b>Senior Product Analyst, Ledgerly</b><span>Owns pricing and retention analytics</span></li>
+            <li><span class="dates">2019 – 2022</span><b>Product Analyst, Northwind SaaS</b><span>Built the company's first experiment platform</span></li>
+            <li><span class="dates">2017 – 2019</span><b>Data Analyst, Brightpath Bank</b><span>Credit-risk reporting and dashboards</span></li>
+          </ol>
+        </section>
+        <section>
+          <span class="label">Skills</span>
+          <div class="skills">
+            <span class="skill">SQL</span><span class="skill">Python</span><span class="skill">A/B testing</span>
+            <span class="skill">dbt</span><span class="skill">Looker</span><span class="skill">Pricing strategy</span>
+            <span class="skill">Stakeholder storytelling</span>
+          </div>
+        </section>
+        <section>
+          <span class="label">Resume &amp; links</span>
+          <div class="panel-links">
+            <button class="btn btn-primary" type="button" id="btn-resume">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+              Download resume (PDF)
+            </button>
+            <a class="btn btn-ghost" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn profile ↗</a>
+            <div class="copy-row">
+              <code id="email-text">alex.morgan@example.com</code>
+              <button class="btn btn-quiet" type="button" id="btn-copy">Copy</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const views = { welcome: $("#view-welcome"), chat: $("#view-chat") };
+  const chatView = $("#view-chat");
+  const messages = $("#messages");
+  const mobile = () => window.matchMedia("(max-width: 960px)").matches;
+  let started = false;
+  let contactShown = false;
+
+  // ---------- Scripted knowledge (replace with your real content / an LLM call) ----------
+  const SRC = "Source: resume.pdf";
+  const answers = [
+    { keys: ["background", "experience", "career", "history", "about"],
+      html: "<p>Alex has 7 years in analytics. They started in credit-risk reporting at Brightpath Bank, moved into product analytics at Northwind SaaS, and since 2022 have been the senior product analyst at Ledgerly, a fintech.</p><p>The common thread is helping product teams decide what to build using data.</p>", src: SRC },
+    { keys: ["skill", "strong", "tools", "stack", "tech"],
+      html: "<p>Strongest skills, in Alex's own ranking:</p><ul><li><b>Experimentation</b>: designed 60+ A/B tests</li><li><b>SQL and dbt</b>: owns Ledgerly's metrics layer</li><li><b>Pricing analysis</b>: led two pricing changes</li><li><b>Explaining results</b> to non-technical leaders</li></ul>", src: SRC },
+    { keys: ["project", "led", "proud", "achievement", "impact"],
+      html: "<p>At Ledgerly, Alex led a pricing-tier redesign. They analysed 18 months of usage data, found that most churn came from small teams outgrowing the free plan, and proposed a new mid-tier.</p><p>Result: churn in that segment fell from 6.1% to 4.3% per month within two quarters.</p>", src: "Source: project-notes.md" },
+    { keys: ["role", "looking", "next", "want", "goal"],
+      html: "<p>Alex is looking for a <b>lead or staff product analyst</b> role at a B2B SaaS or fintech company, ideally owning analytics for a product area and mentoring 1–3 analysts.</p>", src: "Source: career-goals.md" },
+    { keys: ["remote", "relocat", "location", "where", "based", "hybrid"],
+      html: "<p>Alex is based in Toronto. They prefer remote or hybrid roles, and would relocate within Canada for the right role. They are not looking to relocate abroad right now.</p>", src: "Source: career-goals.md" },
+    { keys: ["start", "notice", "available", "availability", "when"],
+      html: "<p>Alex has a 4-week notice period, so the earliest start would be about a month after an offer is accepted.</p>", src: "Source: career-goals.md" },
+  ];
+  const contactKeys = ["contact", "touch", "email", "reach", "call", "interview", "schedule", "talk"];
+
+  // ---------- Routing (#welcome, #chat, #contact, #profile) ----------
+  function show(name) {
+    const route = ["welcome", "chat", "contact", "profile"].includes(name) ? name : "welcome";
+    const isChat = route !== "welcome";
+    views.welcome.hidden = isChat;
+    views.chat.hidden = !isChat;
+    if (isChat) {
+      startChat();
+      if (route === "contact") showContactCard("You asked to get in touch.");
+      if (route === "profile") setPanel(true);
+      else if (mobile()) setPanel(false);
+    }
+  }
+  function go(name) {
+    if (location.hash.slice(1) === name) show(name);
+    else location.hash = name;
+  }
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+  // ---------- Panel ----------
+  function setPanel(open) {
+    if (mobile()) {
+      chatView.classList.remove("panel-closed");
+      chatView.classList.toggle("drawer-open", open);
+    } else {
+      chatView.classList.remove("drawer-open");
+      chatView.classList.toggle("panel-closed", !open);
+    }
+    $("#btn-panel").setAttribute("aria-expanded", String(open));
+  }
+  function panelOpen() {
+    return mobile() ? chatView.classList.contains("drawer-open") : !chatView.classList.contains("panel-closed");
+  }
+  $("#btn-panel").addEventListener("click", () => setPanel(!panelOpen()));
+  $("#btn-close-panel").addEventListener("click", () => setPanel(false));
+  $("#scrim").addEventListener("click", () => setPanel(false));
+
+  // ---------- Messages ----------
+  function scrollDown() { messages.scrollTop = messages.scrollHeight; }
+  function addUser(text) {
+    const row = document.createElement("div");
+    row.className = "msg user";
+    const b = document.createElement("div");
+    b.className = "bubble";
+    b.textContent = text;
+    row.appendChild(b);
+    messages.appendChild(row);
+    scrollDown();
+  }
+  function addBot(html, extraNode) {
+    const row = document.createElement("div");
+    row.className = "msg bot";
+    row.innerHTML = '<div class="avatar" aria-hidden="true">AM</div><div class="bubble">' + html + "</div>";
+    if (extraNode) row.querySelector(".bubble").appendChild(extraNode);
+    messages.appendChild(row);
+    scrollDown();
+    return row;
+  }
+  function typing() {
+    const row = document.createElement("div");
+    row.className = "msg bot";
+    row.innerHTML = '<div class="avatar" aria-hidden="true">AM</div><div class="bubble typing" aria-label="Typing"><i></i><i></i><i></i></div>';
+    messages.appendChild(row);
+    scrollDown();
+    return row;
+  }
+
+  function startChat() {
+    if (started) return;
+    started = true;
+    addBot("<p>Hi, I'm Alex's career assistant. I can answer questions about Alex's experience, skills, projects and what they're looking for next.</p><p>Pick a topic below or type your own question.</p>");
+  }
+
+  function ask(text) {
+    if (!text.trim()) return;
+    if (views.chat.hidden) go("chat");
+    addUser(text);
+    const t = typing();
+    setTimeout(() => { t.remove(); reply(text); }, 750);
+  }
+
+  function reply(text) {
+    const q = text.toLowerCase();
+    if (contactKeys.some((k) => q.includes(k))) {
+      addBot("<p>Happy to connect you. Leave your details and Alex will reply personally.</p>");
+      showContactCard();
+      return;
+    }
+    const hit = answers.find((a) => a.keys.some((k) => q.includes(k)));
+    if (hit) {
+      addBot(hit.html + '<span class="source">' + hit.src + "</span>");
+      return;
+    }
+    // Unknown question: be honest, log it, offer contact.
+    const wrap = document.createElement("div");
+    wrap.innerHTML = '<span class="logged">● Question saved for Alex</span>';
+    if (!contactShown) {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-ghost inline-action";
+      btn.type = "button";
+      btn.textContent = "Leave your email for a reply";
+      btn.addEventListener("click", () => { btn.remove(); showContactCard(); });
+      wrap.appendChild(document.createElement("br"));
+      wrap.appendChild(btn);
+    }
+    addBot("<p>I don't have that in Alex's notes, so I won't guess. I've saved your question and Alex will answer it personally.</p>", wrap);
+  }
+
+  // ---------- Screen 3: Contact capture ----------
+  function showContactCard(prefix) {
+    if (contactShown) {
+      const existing = document.getElementById("contact-card");
+      if (existing) { existing.scrollIntoView({ block: "center" }); const f = existing.querySelector("input"); if (f) f.focus(); }
+      return;
+    }
+    contactShown = true;
+    if (prefix) addBot("<p>" + prefix + " Leave your details and Alex will reply personally.</p>");
+    const card = document.createElement("form");
+    card.className = "contact-card";
+    card.id = "contact-card";
+    card.noValidate = true;
+    card.innerHTML =
+      '<h3>Get in touch with Alex</h3>' +
+      '<p class="lead">Alex usually replies within 2 business days.</p>' +
+      '<div class="field" id="f-name"><label for="c-name">Your name</label><input id="c-name" name="name" autocomplete="name" value="Priya Shah"><span class="err" hidden>Enter your name.</span></div>' +
+      '<div class="field" id="f-email"><label for="c-email">Work email</label><input id="c-email" name="email" type="email" autocomplete="email" placeholder="you@company.com"><span class="err" hidden>Enter a valid email, like you@company.com.</span></div>' +
+      '<div class="field"><label for="c-company">Company <span class="opt">(optional)</span></label><input id="c-company" name="company" autocomplete="organization" value="Fieldstone Analytics"></div>' +
+      '<div class="field"><label for="c-reason">Reason</label><select id="c-reason" name="reason"><option>A role I\'m hiring for</option><option>Schedule an interview</option><option>Freelance or consulting</option><option>Something else</option></select></div>' +
+      '<div class="form-foot"><small>Mockup: nothing is sent.</small><button class="btn btn-primary" type="submit">Send to Alex</button></div>';
+    card.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = card.querySelector("#c-name");
+      const email = card.querySelector("#c-email");
+      const okName = name.value.trim().length > 0;
+      const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+      setErr("f-name", !okName);
+      setErr("f-email", !okEmail);
+      if (!okName) { name.focus(); return; }
+      if (!okEmail) { email.focus(); return; }
+      const first = name.value.trim().split(/\s+/)[0];
+      card.innerHTML =
+        '<div class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>' +
+        '<div><b>Details saved for Alex.</b><br><span>In the real app, Alex gets a notification and replies to ' + escapeHtml(email.value.trim()) + '.</span></div></div>';
+      const t = typing();
+      setTimeout(() => { t.remove(); addBot("<p>Thanks, " + escapeHtml(first) + ". Is there anything else you'd like to know about Alex in the meantime?</p>"); }, 650);
+    });
+    const row = addBot("", card);
+    row.querySelector(".bubble").style.background = "transparent";
+    row.querySelector(".bubble").style.padding = "0";
+    setTimeout(() => card.querySelector("#c-email").focus({ preventScroll: true }), 50);
+  }
+  function setErr(id, bad) {
+    const f = document.getElementById(id);
+    f.classList.toggle("invalid", bad);
+    f.querySelector(".err").hidden = !bad;
+  }
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  // ---------- Toast & misc ----------
+  let toastTimer;
+  function toast(msg) {
+    const el = $("#toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  $("#btn-resume").addEventListener("click", () => toast("Mockup: the real site would download resume.pdf here."));
+  $("#btn-copy").addEventListener("click", () => {
+    const text = $("#email-text").textContent;
+    const fallback = () => {
+      const r = document.createRange();
+      r.selectNodeContents($("#email-text"));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      toast("Email selected. Press Ctrl+C or ⌘C to copy.");
+    };
+    try {
+      navigator.clipboard.writeText(text).then(() => toast("Email copied."), fallback);
+    } catch (e) { fallback(); }
+  });
+  $("#btn-contact").addEventListener("click", () => {
+    if (mobile()) setPanel(false);
+    if (!contactShown) addUser("I'd like to get in touch.");
+    showContactCard();
+  });
+
+  document.addEventListener("click", (e) => {
+    const goBtn = e.target.closest("[data-go]");
+    if (goBtn) { go(goBtn.dataset.go); return; }
+    const askBtn = e.target.closest("[data-ask]");
+    if (askBtn) ask(askBtn.dataset.ask);
+  });
+  $("#composer").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = $("#q");
+    const v = input.value;
+    input.value = "";
+    ask(v);
+  });
+
+  // Start on whatever the link points to (default: welcome).
+  show(location.hash.slice(1));
+})();
+</script>
